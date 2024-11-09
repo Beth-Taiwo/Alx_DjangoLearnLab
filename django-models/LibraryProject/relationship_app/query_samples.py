@@ -5,7 +5,7 @@ author_name = Book.objects.create(name="George Orwell")
 author = Author.objects.get(name=author_name)
 
 # Query all books by a specific author.
-books_by_author = Book.objects.filter(author__name=author)
+books_by_author = Book.objects.filter(author=author)
 
 for book in books_by_author:
     print(book.title)
