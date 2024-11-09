@@ -5,8 +5,9 @@ from.models import Library, Book
 # Create your views here.
 def book_list(request):
       """Retrieves all books and renders a template displaying the list."""
-    #   books = Book.objects.all()
-      return render(request, 'relationship_app/list_books.html', Book.objects.all())
+      books = Book.objects.all()
+      context = {'books': books}
+      return render(request, 'relationship_app/list_books.html', context)
 
 
 # Create a class-based view in relationship_app/views.py that displays details for a specific library, listing all books available in that library.
