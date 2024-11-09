@@ -7,10 +7,10 @@ for book in books_by_author:
     print(book.title)
     
 # List all books in a library.
-books_in_library = Book.objects.all()
+books_in_library = Library.objects.get(name="Custodian")
 
 for book in books_in_library:
-    print(book)
+    print(book.title)
     
 # Retrieve the librarian for a library.
 librarian = library.librarian
