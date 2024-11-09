@@ -9,7 +9,8 @@ for book in books_by_author:
 # List all books in a library.
 books_in_library = Library.objects.get(name="Custodian")
 
-books.all()
+for book in books_in_library:
+    print(book.title)
     
 # Retrieve the librarian for a library.
 librarian = library.librarian
