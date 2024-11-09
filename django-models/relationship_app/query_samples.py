@@ -21,5 +21,7 @@ for book in books_in_library:
     print(book.title)
     
 # Retrieve the librarian for a library.
-librarian = library.librarian
+library = Library.objects.get(name=library_name)
+
+librarian = Librarian.objects.get(library=library) # Access the related librarian via the OneToOne field
 print(librarian.name)
