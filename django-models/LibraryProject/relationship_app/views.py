@@ -4,7 +4,7 @@ from django.views.generic import CreateView
 from .models import Library, Book, UserProfile
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.decorators import user_passes_test, permission_required
+from django.contrib.auth.decorators import permission_required, user_passes_test
 
 # Create your views here.
 def list_books(request):
@@ -13,8 +13,6 @@ def list_books(request):
       context = {'books': books}
       return render(request, 'relationship_app/list_books.html', context)
 
-
-# Create a class-based view in relationship_app/views.py that displays details for a specific library, listing all books available in that library.
 
 class LibraryDetailView(DetailView):
       """Displays details for a specific library and lists all books available in that library."""
