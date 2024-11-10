@@ -1,10 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render,HttpResponse
 from django.views.generic.detail import DetailView
 from django.views.generic import CreateView
 from .models import Library, Book, UserProfile
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import user_passes_test,permission_required
 
 # Create your views here.
 def list_books(request):
@@ -53,3 +53,9 @@ def member_view(request):
       """Displays a view for member purposes."""
       # Code to handle member view goes here
       return render(request, 'relationship_app/member_view.html')
+
+
+@permission_required('relationship_app.can_add_book','relationship_app.can_edit_book','relationship_app.can_delete_book')
+def permission_check(request):
+     permissions = ('relationship_app.can_add_book','relationship_app.can_edit_book','relationship_app.can_delete_book')
+     return HttpResponse("permissions granted")
