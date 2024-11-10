@@ -4,7 +4,7 @@ from django.views.generic import CreateView
 from .models import Library, Book, UserProfile
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.decorators import user_passes_test,permission_required
+from django.contrib.auth.decorators import user_passes_test, permission_required
 
 # Create your views here.
 def list_books(request):
@@ -55,7 +55,7 @@ def member_view(request):
       return render(request, 'relationship_app/member_view.html')
 
 
-@permission_required('relationship_app.can_add_book','relationship_app.can_edit_book','relationship_app.can_delete_book')
+@permission_required('relationship_app.can_add_book','relationship_app.can_edit_book','relationship_app.can_delete_book','relationship_app.can_change_book')
 def permission_check(request):
-     permissions = ('relationship_app.can_add_book','relationship_app.can_edit_book','relationship_app.can_delete_book')
+     permissions = ('relationship_app.can_add_book','relationship_app.can_edit_book','relationship_app.can_delete_book','relationship_app.can_change_book')
      return HttpResponse("permissions granted")
