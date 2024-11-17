@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser,BaseUserManager
 
 # Create your models here.
 class Book(models.Model):
@@ -17,3 +17,23 @@ class CustomUser(AbstractUser):
    date_of_birth = models.DateTimeField()
    profile_photo = models.ImageField()
     
+    
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, password, date_of_birth, profile_photo, **extra_fields):
+        if not email:
+            raise ValueError("Email must be provided")
+        if not password:
+            raise ValueError("Password must be provided")
+        
+        user = self.model(
+            email=self.normalize_email(email),
+            date_of_birth=date_of_birth,
+            profile_photo=profile_photo,
+            **extra_fields)
+        
+    def create_superuser(self, email, password, date_of_birth, profile = None):
+        user = self.create_user(email, password, date_of_birth, profile)
+        user.is_staff = True
+        user.is_superuser = True
+        user.save()
+        return user
