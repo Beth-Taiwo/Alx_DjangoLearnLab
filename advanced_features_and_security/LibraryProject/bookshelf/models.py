@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser,BaseUserManager
+from LibraryProject import settings
 
 # Create your models here.
 class Book(models.Model):
@@ -20,6 +21,14 @@ class Book(models.Model):
     def __repr__(self):
         return f"{self.title} by {self.author}, published in {self.publication_year}"
     
+class Review(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="reviews")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="user_reviews")
+    review_text = models.TextField()
+    created_at = models.DateTimeField()
+
+    def __str__(self):
+        return f"Review for {self.book.title} by {self.user.username}"
 
 class CustomUser(AbstractUser):
    date_of_birth = models.DateTimeField()
