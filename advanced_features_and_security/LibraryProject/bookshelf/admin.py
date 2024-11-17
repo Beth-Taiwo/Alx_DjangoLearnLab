@@ -12,7 +12,7 @@ class BookAdmin(admin.ModelAdmin):
     search_fields = ['author', 'title', 'publication_year']
     
 
-class CustomUserAdmin(admin.ModelAdmin):
+class CustomUserAdmin(UserAdmin):
     list_display = ('username', 'email', 'date_of_birth', 'profile_photo')
     list_filter = ('date_of_birth',)
     search_fields = ['username', 'email']
