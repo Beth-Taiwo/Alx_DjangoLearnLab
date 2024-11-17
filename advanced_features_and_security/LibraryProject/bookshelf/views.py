@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from .forms import ExampleForm
 
 # Create your views here.
 
@@ -29,8 +30,9 @@ class BookReviewView(DetailView, PermissionRequiredMixin):
     permission_required = 'bookshelf.review_book'
     """
     model = Book
-    template_name = 'bookshelf/book_review.html'  # Template to use for rendering the view
+    template_name = 'bookshelf/form_example.html'  # Template to use for rendering the view
     raise_exception = True
+    form_class = ExampleForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)  # Retrieve the context data from the superclass
