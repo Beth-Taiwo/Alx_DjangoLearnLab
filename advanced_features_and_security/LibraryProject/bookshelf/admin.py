@@ -27,17 +27,11 @@ class CustomUserAdmin(UserAdmin):
             'fields': ('username', 'email', 'date_of_birth', 'profile_photo', 'password1', 'password2')
         }),
     )
-    ordering = ('username',)
-    filter_horizontal = ()
-    readonly_fields = ('date_of_birth',)
-    form = CustomUserAdminForm
-    add_form = CustomUserAddForm
-    change_form = CustomUserChangeForm
-    inlines = [BookInline]
+   
     
     def save_model(self, request, obj, form, change):
         if not change:
             obj.set_password(form.cleaned_data['password1'])
         super().save_model(request, obj, form, change)
         
-admin.site.register(CustomUser,CustomUserAdmin)
+admin.site.register(CustomUser, CustomUserAdmin)
