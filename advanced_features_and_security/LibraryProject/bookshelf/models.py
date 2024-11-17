@@ -7,6 +7,14 @@ class Book(models.Model):
     author = models.CharField(max_length=100)
     publication_year = models.IntegerField()
     
+    class Meta:
+        permissions = [
+            ('can_view', 'Can view books'),
+            ('can_create', "Can create a new book"),
+            ('can_edit', 'Can edit a book'),
+            ("can_delete", 'Can delete a book')
+        ]
+    
     def __str__(self):
         return f"{self.title} by {self.author}, published in {self.publication_year}"
     def __repr__(self):
@@ -37,3 +45,5 @@ class CustomUserManager(BaseUserManager):
         user.is_superuser = True
         user.save()
         return user
+    
+
