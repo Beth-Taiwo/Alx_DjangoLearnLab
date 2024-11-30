@@ -1,4 +1,4 @@
-from .serializer import BookSerializer, AuthorSerializer
+from .serializers import BookSerializer, AuthorSerializer
 from.models import Book, Author
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
