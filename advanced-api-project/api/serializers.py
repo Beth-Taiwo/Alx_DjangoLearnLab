@@ -15,7 +15,7 @@ class BookSerializer(serializers.ModelSerializer):
     
 class AuthorSerializer(serializers.ModelSerializer):
      # A nested BookSerializer to serialize the related books dynamically.
-    author = BookSerializer(read_only=True)
+    author = BookSerializer(many=True,read_only=True)
     class Meta:
         model = Author
         fields = ('id', 'name')
