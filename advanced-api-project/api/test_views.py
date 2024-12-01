@@ -3,6 +3,7 @@ from .models import Book, Author
 from rest_framework.test import APITestCase
 # from .views import BookViewSet
 from rest_framework import status
+from rest_framework.test import APIClient
 
 class BookTestCase(TestCase):
     def setUp(self):
@@ -58,6 +59,18 @@ class BookViewSetTestCase(APITestCase):
         self.assertEqual(len(response.data), 2)
         self.assertEqual(response.data[0]['title'], 'The Great Gatsby')
         self.assertEqual(response.data[1]['title'], 'To Kill a Mockingbird')
+        
+    def test_for_authentication(self):
+        """
+        Ensure that only authenticated users can access the API
+        """
+        
+        client = APIClient()
+        client.login(username='lauren', password='secret')
+        url = '/api/books/delete/1'
+        response = self.client.post(url, format='json')
+        # self.assertEqual(response.headers, status.HTTP_401_UNAUTHORIZED)
+        print(response.content)
         
         
 class AuthorTestCase(APITestCase):

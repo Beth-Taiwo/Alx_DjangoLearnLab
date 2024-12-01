@@ -1,11 +1,13 @@
 from .serializers import BookSerializer, AuthorSerializer
 from.models import Book, Author
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, filters, status
 from rest_framework.response import Response
-from django.views.generic import CreateView, ListView, DeleteView, UpdateView, DetailView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.views import APIView
+from django.views.generic import CreateView, ListView, DeleteView, UpdateView, DetailView
 from django_filters import rest_framework
-from rest_framework import filters
+from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
 
 # Create your views here.
 
@@ -65,12 +67,25 @@ class BookUpdateView(UpdateView):
 
 class BookDeleteView(DeleteView):
     model = Book
-    # success_url = '/books/'
+    success_url = reverse_lazy('book-list')
     permission_classes = [IsAuthenticated]
     
-    
-    def get(self, request):
-        return Response({'message': 'Book deleted successfully'})
+    def delete(self, request, *args, **kwargs):
+        # Check permissions
+        self.check_permissions(request)
+
+        # Get the object to delete
+        book = self.get_object()
+
+        # Delete the object
+        book.delete()
+
+        # Return a DRF response
+        # return Response({'message': 'Book deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+
+ 
+    # def get(self, request):
+    #     return Response({'message': 'Method GET not allowed'})
     
 
 class BookDetailView(DetailView):
