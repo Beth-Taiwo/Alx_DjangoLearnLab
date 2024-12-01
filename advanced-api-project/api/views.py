@@ -4,6 +4,8 @@ from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from django.views.generic import CreateView, ListView, DeleteView, UpdateView, DetailView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 # Create your views here.
 
@@ -12,10 +14,15 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticate
 class BookList(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['title', 'author','publication_year']
     
 class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    filter_backends = [filters.SearchFilter,filters.OrderingFilter]
+    search_fields = ['title', 'author','publication_year']
+    ordering_fields = ['title', 'publication_year']
 
 class AuthorView(generics.ListAPIView):
     queryset = Author.objects.all()
@@ -72,8 +79,11 @@ class BookDetailView(DetailView):
     
 class BookListView(ListView):
     model = Book
-    template_name = 'books/book_list.html'
+    # template_name = 'books/book_list.html'
     permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [filters.SearchFilter,filters.OrderingFilter]
+    search_fields = ['title', 'author','publication_year']
+    ordering_fields = ['title', 'publication_year']
     
     def get(self, request):
         return Response({'message': 'Book list retrieved successfully'})
@@ -95,7 +105,7 @@ class AuthorCreateView(CreateView):
 class AuthorUpdateView(UpdateView):
     model = Author
     fields = '__all__'
-    success_url = '/authors/'
+    # success_url = '/authors/'
     permission_classes = [IsAuthenticated]
     
     def get(self, request):
