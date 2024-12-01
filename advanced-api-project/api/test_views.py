@@ -1,7 +1,7 @@
 from django.test import TestCase
 from .models import Book, Author
 from rest_framework.test import APITestCase
-from .views import BookViewSet
+# from .views import BookViewSet
 from rest_framework import status
 
 class BookTestCase(TestCase):
@@ -43,6 +43,21 @@ class BookViewSetTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Book.objects.count(), 1)
         self.assertEqual(Book.objects.get().title, 'F. Scott Fitzgerald')
+        
+        
+    def test_get_books(self):
+        """
+        Ensure we can retrieve a list of books
+        """
+        Book.objects.create(title='The Great Gatsby', author=self.author, publication_year=1925)
+        Book.objects.create(title='To Kill a Mockingbird', author=self.author, publication_year=1960)
+        
+        url = '/api/books_all/'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['title'], 'The Great Gatsby')
+        self.assertEqual(response.data[1]['title'], 'To Kill a Mockingbird')
         
         
 class AuthorTestCase(APITestCase):
