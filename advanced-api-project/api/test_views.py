@@ -1,5 +1,8 @@
 from django.test import TestCase
 from .models import Book, Author
+from rest_framework.test import APITestCase
+from .views import BookViewSet
+from rest_framework import status
 
 class BookTestCase(TestCase):
     def setUp(self):
@@ -19,3 +22,37 @@ class BookTestCase(TestCase):
         
         self.assertEqual(str(kill_a_mockingbird), 'To Kill a Mockingbird by Harper Lee, published in 1960')
         self.assertEqual(repr(kill_a_mockingbird), 'To Kill a Mockingbird by Harper Lee, published in 1960')
+        
+        
+
+class BookViewSetTestCase(APITestCase):
+    def setUp(self):
+        self.author = Author.objects.create(name='F. Scott Fitzgerald')
+        
+    def test_create_book(self):
+        """
+        Ensure we can create a new book
+        """
+        url = '/api/books_all/'
+        data = {
+            'title': 'F. Scott Fitzgerald',
+            'author': self.author.pk,
+            'publication_year': 1949,
+        }
+        response =  self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Book.objects.count(), 1)
+        self.assertEqual(Book.objects.get().title, 'F. Scott Fitzgerald')
+        
+        
+class AuthorTestCase(APITestCase):
+    def test_create_author(self):
+        """
+        Ensure we can create a new author
+        """
+        url = '/api/authors_all/'
+        data = {'name': 'F. Scott Fitzgerald'}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Author.objects.count(), 1)
+        self.assertEqual(Author.objects.get().name, 'F. Scott Fitzgerald')
