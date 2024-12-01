@@ -23,6 +23,11 @@ class BookViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter,filters.OrderingFilter]
     search_fields = ['title', 'author','publication_year']
     ordering_fields = ['title', 'publication_year']
+    
+class AuthorViewSet(viewsets.ModelViewSet):
+    queryset = Author.objects.all()
+    serializer_class = AuthorSerializer
+   
 
 class AuthorView(generics.ListAPIView):
     queryset = Author.objects.all()
