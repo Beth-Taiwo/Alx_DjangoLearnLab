@@ -64,7 +64,7 @@ class BookViewSetTestCase(APITestCase):
         """
         Ensure that only authenticated users can access the API
         """
-        
+        # self.client.login
         client = APIClient()
         client.login(username='lauren', password='secret')
         url = '/api/books/delete/1'
