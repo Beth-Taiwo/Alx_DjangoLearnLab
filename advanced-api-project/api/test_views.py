@@ -1,9 +1,10 @@
 from django.test import TestCase
 from .models import Book, Author
 from rest_framework.test import APITestCase
-# from .views import BookViewSet
+from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APIClient
+from rest_framework.reverse import reverse
 
 class BookTestCase(TestCase):
     def setUp(self):
@@ -64,13 +65,17 @@ class BookViewSetTestCase(APITestCase):
         """
         Ensure that only authenticated users can access the API
         """
-        # self.client.login
-        client = APIClient()
-        client.login(username='lauren', password='secret')
-        url = '/api/books/delete/1'
-        response = self.client.post(url, format='json')
-        # self.assertEqual(response.headers, status.HTTP_401_UNAUTHORIZED)
-        print(response.content)
+        User.objects.create_user('lauren','somethinf@me.com','secret')
+        author = Author.objects.create(name = 'Lauren')
+        Book.objects.create(title = 'dummy title', publication_year = 2000, author = author)
+        url = reverse('book_delete', kwargs={'pk': 1})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        
+        self.client.login(username='lauren', password='secret')
+        authenticated_user_response = self.client.post(url)
+        self.assertEqual(authenticated_user_response.status_code, status.HTTP_302_FOUND)
+      
         
         
 class AuthorTestCase(APITestCase):
