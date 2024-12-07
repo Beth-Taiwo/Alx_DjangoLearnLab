@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
+from django.views.generic.base import TemplateView as BaseView
 from .form import RegisterForm
 from django.contrib.auth import login
 
@@ -26,6 +27,12 @@ class RegisterView(CreateView):
         return context
     
     
-# Profile Management Features:
-# Develop a view that allows authenticated users to view and edit their profile details. This view should handle POST requests to update user information.
-# Ensure the user can change their email and optionally extend the user model to include more fields like a profile picture or bio.
+class ProfileView(BaseView):
+    template_name = 'blog/profile.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user
+        return context
+    
+    
