@@ -10,6 +10,17 @@
   <body>
     <h1>Profile Management</h1>
     <p>Welcome, {{ user.username }}</p>
-    <a href="">Edit Profile</a>
+    <!-- {% extends "base_generic.html" %} {% block content %}
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <h2>Account Information</h2>
+      {{ user_form.as_p }}
+
+      <h2>Profile Information</h2>
+      {{ profile_form.as_p }}
+
+      <button type="submit">Save changes</button>
+    </form>
+    {% endblock %} -->
   </body>
 </html>
