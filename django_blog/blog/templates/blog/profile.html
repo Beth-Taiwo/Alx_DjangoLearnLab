@@ -1,0 +1,15 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Profile Management</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  </head>
+  <body>
+    <h1>Profile Management</h1>
+    <p>Welcome, {{ user.username }}</p>
+    <a href="">Edit Profile</a>
+  </body>
+</html>
