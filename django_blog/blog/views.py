@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views.generic import (
@@ -13,8 +13,9 @@ from .forms import RegisterForm, UserProfileForm, ProfileForm
 from django.contrib.auth import login
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -74,7 +75,6 @@ class ProfileView(TemplateView):
 class PostView(TemplateView):
     template_name = "blog/posts.html"
 
-
 class PostCreateView(CreateView):
     model = Post
     fields = ['title', 'content']
@@ -86,20 +86,25 @@ class PostCreateView(CreateView):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
+@login_required
+def update_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.method == 'POST':
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('posts')
+    else:
+        form = PostForm(instance=post)
+    return render(request, 'blog/post_form.html', {'form': form, 'message': "Post updated successfully"})
 
-class PostUpdateView(UpdateView):
-    model = Post
-    fields = "__all__"
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        return Response({"message": "Post updated successfully"})
-
-
-class PostDeleteView(LoginRequiredMixin, DeleteView):
-    model = Post
-    success_url = reverse_lazy("posts")
-    raise_exception = True
+@login_required
+def delete_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.method == 'POST':
+        post.delete()
+        return redirect(reverse_lazy('posts'))  
+    return render(request, 'blog/post_confirm_delete.html', {'post': post})
 
 
 class PostDetailView(DetailView):
