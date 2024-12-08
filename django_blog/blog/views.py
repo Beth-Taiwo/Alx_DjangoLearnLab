@@ -14,7 +14,7 @@ from django.contrib.auth import login
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import Post
+from .models import Post, Comment
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
@@ -119,6 +119,13 @@ class PostListView(ListView):
     model = Post
     template_name = "blog/posts.html"
     permission_classes = [IsAuthenticatedOrReadOnly]
+    
+class PostCreateComment(CreateView):
+    model = Comment
+    fields = ['content']
+    template_name = 'blog/comments.html'
+    success_url = reverse_lazy('posts')
+    permission_classes = [IsAuthenticated]
    
 
 def logout_view(request):

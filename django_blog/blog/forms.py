@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Profile, Post
+from .models import Profile, Post, Comment
 
 
 class RegisterForm(UserCreationForm):
@@ -40,3 +40,37 @@ class PostForm(forms.ModelForm):
         if commit:
             post.save()
         return post
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ["content"]
+        
+        def __init__(self, *args, **kwargs):
+            self.post = kwargs.pop("post", None)
+            super().__init__(*args, **kwargs)
+            
+            if self.post:
+                self.fields["author"].initial = self.post.author
+                
+                # Ensure the comment author is the same as the post author
+                self.fields["author"].widget.attrs["disabled"] = True
+                
+                # Hide the comment creation date field
+                self.fields["created_at"].widget = forms.HiddenInput()
+                self.fields["updated_at"].widget = forms.HiddenInput()
+                
+            # Limit the comment length to 500 characters
+            self.fields["content"].widget.attrs["maxlength"] = 500
+            self.fields["content"].widget.attrs["rows"] = 5
+            self.fields["content"].widget.attrs["placeholder"] = "Write a comment..."
+            
+        def save(self, commit=True):
+            comment = super().save(commit=False)
+            if self.post:
+                comment.post = self.post
+            if commit:
+                comment.save()
+            return comment
+    
