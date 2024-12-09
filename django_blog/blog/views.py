@@ -120,13 +120,28 @@ class PostListView(ListView):
     template_name = "blog/posts.html"
     permission_classes = [IsAuthenticatedOrReadOnly]
     
-class PostCreateComment(CreateView):
+class CommentCreateView(CreateView):
     model = Comment
     fields = ['content']
     template_name = 'blog/comments.html'
-    success_url = reverse_lazy('posts')
+    success_url = reverse_lazy('comments')
     permission_classes = [IsAuthenticated]
    
+
+class CommentUpdateView(UpdateView):
+    model = Comment
+    fields = ['content']
+    template_name = 'blog/comment_form.html'
+    success_url = reverse_lazy('comments')
+    permission_classes = [IsAuthenticated]
+    
+    
+class CommentDeleteView(DeleteView):
+    model = Comment
+    template_name = 'blog/comment_confirm_delete.html'
+    success_url = reverse_lazy('comments')
+    permission_classes = [IsAuthenticated]
+    
 
 def logout_view(request):
     if request.method == "POST":
