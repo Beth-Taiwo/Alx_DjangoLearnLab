@@ -1,6 +1,10 @@
 {% extends "base.html" %} {% load static %} {% block content %}
 
-<h1>Post Detail of Post: {{post.id}}</h1>
+<h1>
+  Post Detail of Post: {{post.id}}
+  <a href="{% url 'post_update' pk=post.id %}">Edit</a>
+  <a href="{% url 'post_delete' pk=post.id %}">Delete</a>
+</h1>
 <p>{{ post }}</p>
 <h3>Comments</h3>
 <form method="post" action="{% url 'comment_create' post.id %}">
@@ -13,8 +17,11 @@
     {% for comment in comments %}
     <li>
       {{ comment.author.username }}:
-      <a href="{% url 'comment_update' pk=comment.id %}"
+      <a href="{% url 'comment_update' post_pk=post.id pk=comment.id %}"
         >{{ comment.content }}</a
+      >
+      <a href="{% url 'comment_delete' post_pk=post.id pk=comment.id %}"
+        >Delete</a
       >
     </li>
     {% endfor %}

@@ -109,11 +109,9 @@ def delete_post(request, pk):
         return redirect(reverse_lazy('posts'))  
     return render(request, 'blog/post_confirm_delete.html', {'post': post})
 
-
 class PostDetailView(DetailView):
     model = Post
     template_name = "blog/post_detail.html"
-    
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -133,8 +131,8 @@ class CommentCreateView(CreateView):
     permission_classes = [IsAuthenticated]
     
     def form_valid(self, form):
-        print(self.kwargs.get('post_id'))
-        form.instance.post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
+        print(self.kwargs.get('pk'))
+        form.instance.post = get_object_or_404(Post, pk=self.kwargs.get('pk'))
         form.instance.author = self.request.user
         return super().form_valid(form)
     
@@ -142,22 +140,30 @@ class CommentCreateView(CreateView):
         return self.request.user.has_perm('blog.add_comment')
     
     def get_success_url(self):
-        return reverse_lazy('post_detail',args=[self.kwargs.get('post_id')])
+        return reverse_lazy('post_detail',args=[self.kwargs.get('pk')])
 
 class CommentUpdateView(UpdateView):
     model = Comment
     fields = ['content']
     template_name = 'blog/comment_form.html'
-    success_url = reverse_lazy('comments')
     permission_classes = [IsAuthenticated]
     
+    def get_success_url(self):
+        return reverse_lazy('post_detail',args=[self.kwargs.get('post_pk')])
     
 class CommentDeleteView(DeleteView):
     model = Comment
     template_name = 'blog/comment_confirm_delete.html'
-    success_url = reverse_lazy('comments')
     permission_classes = [IsAuthenticated]
     
+    def get_success_url(self):
+        return reverse_lazy('post_detail',args=[self.kwargs.get('post_pk')])
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["post"] = self.object.post
+        return context
+  
     def search_view(request):
         queryset = Post.objects.all()
         form = SearchForm()
