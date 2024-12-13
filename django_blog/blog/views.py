@@ -83,17 +83,6 @@ class PostCreateView(LoginRequiredMixin,UserPassesTestMixin,CreateView):
     
     def test_func(self):
         return self.request.user.has_perm('blog.add_post')
-    
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        context['post'] = Post.objects.all()  # Add the post to the context for use in the form
-        return context
-      
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        context['post'] = Post.objects.all()  # Add the post to the context for use in the form
-        return context
 
 @login_required
 def update_post(request, pk):
@@ -120,14 +109,12 @@ class PostDetailView(DetailView):
     model = Post
     template_name = "blog/post_detail.html"
 
-    def get(self, request):
-        return Response({"message": "Post details retrieved successfully"})
-
 
 class PostListView(ListView):
     model = Post
     template_name = "blog/posts.html"
     permission_classes = [IsAuthenticatedOrReadOnly]
+    context_object_name = 'posts'  # Optional: To customize the context name (defaults to object_list)
     
 class CommentCreateView(CreateView):
     model = Comment
