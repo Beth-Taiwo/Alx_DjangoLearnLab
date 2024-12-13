@@ -9,7 +9,7 @@ from django.views.generic import (
     UpdateView,
     DetailView,
 )
-from .forms import RegisterForm, UserProfileForm, ProfileForm, PostForm
+from .forms import RegisterForm, UserProfileForm, ProfileForm, PostForm, CommentForm
 from django.contrib.auth import login
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
@@ -83,6 +83,11 @@ class PostCreateView(LoginRequiredMixin,UserPassesTestMixin,CreateView):
     
     def test_func(self):
         return self.request.user.has_perm('blog.add_post')
+    
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['message'] = 'Create a new post'
+        return context
 
 @login_required
 def update_post(request, pk):
@@ -94,7 +99,7 @@ def update_post(request, pk):
             return redirect('posts')
     else:
         form = PostForm(instance=post)
-    return render(request, 'blog/post_form.html', {'form': form, 'message': "Post updated successfully"})
+    return render(request, 'blog/post_form.html', {'form': form, 'message': "Update Post"})
 
 @login_required
 def delete_post(request, pk):
@@ -108,7 +113,13 @@ def delete_post(request, pk):
 class PostDetailView(DetailView):
     model = Post
     template_name = "blog/post_detail.html"
-
+    
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = CommentForm()
+        context['comments'] = Comment.objects.filter(post=self.object)
+        return context
 
 class PostListView(ListView):
     model = Post
@@ -119,10 +130,19 @@ class PostListView(ListView):
 class CommentCreateView(CreateView):
     model = Comment
     fields = ['content']
-    template_name = 'blog/comments.html'
-    success_url = reverse_lazy('comments')
     permission_classes = [IsAuthenticated]
-   
+    
+    def form_valid(self, form):
+        print(self.kwargs.get('post_id'))
+        form.instance.post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+    
+    def test_func(self):
+        return self.request.user.has_perm('blog.add_comment')
+    
+    def get_success_url(self):
+        return reverse_lazy('post_detail',args=[self.kwargs.get('post_id')])
 
 class CommentUpdateView(UpdateView):
     model = Comment
