@@ -9,7 +9,7 @@ from django.views.generic import (
     UpdateView,
     DetailView,
 )
-from .forms import RegisterForm, UserProfileForm, ProfileForm
+from .forms import RegisterForm, UserProfileForm, ProfileForm, PostForm
 from django.contrib.auth import login
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
@@ -70,10 +70,6 @@ class ProfileView(TemplateView):
             self.get_context_data(user_form=user_form, profile_form=profile_form)
         )
 
-
-class PostView(TemplateView):
-    template_name = "blog/posts.html"
-
 class PostCreateView(LoginRequiredMixin,UserPassesTestMixin,CreateView):
     model = Post
     fields = ['title', 'content']
@@ -88,6 +84,12 @@ class PostCreateView(LoginRequiredMixin,UserPassesTestMixin,CreateView):
     def test_func(self):
         return self.request.user.has_perm('blog.add_post')
     
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['post'] = Post.objects.all()  # Add the post to the context for use in the form
+        return context
+      
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context['post'] = Post.objects.all()  # Add the post to the context for use in the form
