@@ -9,7 +9,7 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     
     def __str__(self):
-        return f"{self.title} by {self.author.username} with {self.content.upper()}"
+        return f"{self.title} by {self.author.username.capitalize()} with {self.content.upper()}"
 
 
 class Profile(models.Model):
