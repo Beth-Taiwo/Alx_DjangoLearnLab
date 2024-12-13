@@ -1,26 +1,14 @@
-{% load static %}
+{% extends "base.html" %} {% load static %} {% block content %}
+<h1>Profile Management</h1>
+<p>Welcome, {{ user.username }}</p>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <h2>Account Information</h2>
+  {{ user_form.as_p }}
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Profile Management</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
-  </head>
-  <body>
-    <h1>Profile Management</h1>
-    <p>Welcome, {{ user.username }}</p>
-    <!-- {% extends "base_generic.html" %} {% block content %}
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      <h2>Account Information</h2>
-      {{ user_form.as_p }}
+  <h2>Profile Information</h2>
+  {{ profile_form.as_p }}
 
-      <h2>Profile Information</h2>
-      {{ profile_form.as_p }}
-
-      <button type="submit">Save changes</button>
-    </form>
-    {% endblock %} -->
-  </body>
-</html>
+  <button type="submit">Save changes</button>
+</form>
+{% endblock %}
