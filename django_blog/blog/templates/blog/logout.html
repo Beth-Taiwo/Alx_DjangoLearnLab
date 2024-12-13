@@ -7,9 +7,10 @@
     <title>Logout</title>
   </head>
   <body>
-    <form id="logout-form" method="post" action="{% url 'logout' %}">
+    <p>You have successfully logged out, login to continue.</p>
+    <form id="login-form" method="post" action="{% url 'login' %}">
       {% csrf_token %}
-      <button type="submit">Logout</button>
+      <button type="submit">Login</button>
     </form>
   </body>
 </html>
