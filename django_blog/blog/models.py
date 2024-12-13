@@ -9,8 +9,8 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     
     def __str__(self):
-        return f"{self.title} by {self.author.username}"
-    
+        return f"{self.title} by {self.author.username} with {self.content.upper()}"
+
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -34,3 +34,6 @@ class Comment(models.Model):
 class Tag(models.Model):
     name = models.CharField(max_length=20)
     posts = models.ManyToManyField(Post)
+    
+    def __str__(self):
+        return self.name
