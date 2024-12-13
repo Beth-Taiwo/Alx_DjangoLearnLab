@@ -14,8 +14,9 @@ from django.contrib.auth import login
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import Post, Comment
+from .models import Post, Comment,Tag, Profile
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 # Create your views here.
 
@@ -23,20 +24,17 @@ from django.contrib.auth.decorators import login_required
 def home_view(request):
     return render(request, "blog/base.html")
 
-
 class RegisterView(CreateView):
+
     form_class = RegisterForm
     success_url = reverse_lazy("home")  # redirect to home page on success
-    template_name = "blog/base.html"
+    template_name = "blog/register.html"
 
     def form_valid(self, form):
-        form.save()
-        login(self.request, user)
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = "Sign Up"
         return context
 
 
@@ -45,15 +43,16 @@ class ProfileView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["user"] = self.request.user
+        user = self.request.user
+        if user.is_authenticated:
 
-        # Ensure the profile exists
-        if not hasattr(user, "profile"):
-            Profile.objects.create(user=user)
+            # Ensure the profile exists
+            if not hasattr(user, "profile"):
+                Profile.objects.create(user=user)
 
-        context["user"] = user
-        context["user_form"] = UserProfileForm(instance=user)
-        context["profile_form"] = ProfileForm(instance=user.profile)
+            # context["user"] = user
+            context["user_form"] = UserProfileForm(instance=user)
+            context["profile_form"] = ProfileForm(instance=user.profile)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -75,7 +74,7 @@ class ProfileView(TemplateView):
 class PostView(TemplateView):
     template_name = "blog/posts.html"
 
-class PostCreateView(CreateView):
+class PostCreateView(LoginRequiredMixin,UserPassesTestMixin,CreateView):
     model = Post
     fields = ['title', 'content']
     template_name = 'blog/post_form.html' 
@@ -85,6 +84,14 @@ class PostCreateView(CreateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
+    
+    def test_func(self):
+        return self.request.user.has_perm('blog.add_post')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['post'] = Post.objects.all()  # Add the post to the context for use in the form
+        return context
 
 @login_required
 def update_post(request, pk):
@@ -141,6 +148,60 @@ class CommentDeleteView(DeleteView):
     template_name = 'blog/comment_confirm_delete.html'
     success_url = reverse_lazy('comments')
     permission_classes = [IsAuthenticated]
+    
+    def search_view(request):
+        queryset = Post.objects.all()
+        form = SearchForm()
+
+    # if request.method == "GET":
+    #     form = SearchForm(request.GET)
+    #     if form.is_valid():
+    #         query = form.cleaned_data['to_search']
+    #         searched_items = queryset.filter(Q(title__icontains=query)|Q(content__icontains=query))
+    #     else:
+    #         form = SearchForm()
+    #     context = {
+    #         'post_list': searched_items,
+    #         'search_form': form,
+    #     }
+        # return render(request, 'search.html', context=context)
+
+def tag_view(request, tag_name):
+    tag = get_object_or_404(klass=Tag, name__iexact=tag_name)
+    post_by_tag = Post.objects.filter(Q(tags__name__icontains=tag.name))
+
+    context = {
+        'posts':post_by_tag,
+        'tag_name':tag_name
+    }
+
+    return render(request, 'tags.html', context=context)
+    
+
+class PostByTagListView():
+    model = Post
+    template_name = "blog/posts_by_tag.html"
+    def get_queryset(self):
+        tag = get_object_or_404(Tag, name__iexact=self.kwargs['tag_name'])
+        return Post.objects.filter(tags__name__icontains=tag.name)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tag_name'] = self.kwargs['tag_name']
+        return context
+    
+
+class SearchView(ListView):
+    model = Post
+    template_name = "blog/search_results.html"
+    def get_queryset(self):
+        query = self.request.GET.get('to_search', '')
+        return Post.objects.filter(Q(title__icontains=query)|Q(content__icontains=query))
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_query'] = self.request.GET.get('to_search', '')
+        return context
     
 
 def logout_view(request):
