@@ -1,14 +1,23 @@
-{% load static %}
+{% extends "base.html" %} {% load static %} {% block content %}
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>post_detail</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
-  </head>
-  <body>
-    <h1>Post Detail of Post: {{post.id}}</h1>
-    <p>{{ post }}</p>
-  </body>
-</html>
+<h1>Post Detail of Post: {{post.id}}</h1>
+<p>{{ post }}</p>
+<h3>Comments</h3>
+<form method="post" action="{% url 'comment_create' post.id %}">
+  {% csrf_token %} {{ form.as_p }}
+  <button type="submit">Save</button>
+</form>
+<h3>Comments</h3>
+<div>
+  <ul>
+    {% for comment in comments %}
+    <li>
+      {{ comment.author.username }}:
+      <a href="{% url 'comment_update' pk=comment.id %}"
+        >{{ comment.content }}</a
+      >
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}
