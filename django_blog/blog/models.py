@@ -11,7 +11,7 @@ class Post(models.Model):
     tags = TaggableManager()
     
     def __str__(self):
-        return f"{self.title} by {self.author.username.capitalize()} with {self.content.upper()}"
+        return f"{self.title} by {self.author.username.capitalize()} with {self.content.title()}, with added tags: {', '.join([tag.name for tag in self.tags.all()]).title()}"
 
 
 class Profile(models.Model):
@@ -37,5 +37,5 @@ class Tag(models.Model):
     name = models.CharField(max_length=20)
     posts = models.ManyToManyField(Post)
     
-    def __str__(self):
-        return self.name
+    def __repr__(self):
+        return f"Tag(name={self.name}, num_posts={self.posts.count()})"

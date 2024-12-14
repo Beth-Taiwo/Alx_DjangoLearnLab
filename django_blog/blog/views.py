@@ -72,7 +72,7 @@ class ProfileView(TemplateView):
 
 class PostCreateView(LoginRequiredMixin,UserPassesTestMixin,CreateView):
     model = Post
-    fields = ['title', 'content']
+    fields = ['title', 'content','tags']
     template_name = 'blog/post_form.html' 
     success_url = reverse_lazy('posts')  
     permission_classes = [IsAuthenticated]

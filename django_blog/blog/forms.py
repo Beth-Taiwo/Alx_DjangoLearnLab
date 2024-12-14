@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Profile, Post, Comment
-from taggit.forms import TagWidget
+from django.forms import Textarea
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -28,21 +28,29 @@ class PostForm(forms.ModelForm):
     tags = forms.CharField(
         max_length=50,
         required=False,
-        help_text='Add new tag',
-        widget=TagWidget())
+        help_text='Add new tag (comma-separated)',
+        widget= forms.TextInput(attrs={'placeholder': 'e.g., tag1, tag2, tag3'})
+    )
+    
     class Meta:
         model = Post
-        fields = ["title", "content"]
+        fields = ["title", "content", "tags"]
+        widgets = {
+            "content": Textarea(attrs={"cols": 100, "rows": 25}),
+        }
         
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['tags'].initial = ','.join([tag.name for tag in self.instance.tags.all()])
 
     def save(self, commit=True):
         post = super().save(commit=False)
-        tag = self.cleaned_data["tags"]
-        if tag:
-            post.tags.add(*tag.split(","))
+        tags = self.cleaned_data.get("tags", "")
+        if tags:
+            post.save()  # Save the post to generate an ID before adding tags
+            post.tags.set([t.strip() for t in tags.split(",")])
         if self.user:
             post.author = self.user
         if commit:

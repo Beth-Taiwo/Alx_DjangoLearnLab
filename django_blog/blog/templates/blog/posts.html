@@ -4,5 +4,6 @@
   {% for post in posts %}
   <li><a href="{% url 'post_detail' pk=post.id %}">{{ post }}</a></li>
   {% endfor %}
+  <p>{% for tag in post.tags.all %}{{ tag.name }} {% endfor %}</p>
 </ul>
 {% endblock%}
