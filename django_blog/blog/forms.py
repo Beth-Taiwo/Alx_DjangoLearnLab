@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Profile, Post, Comment
-
+from taggit.forms import TagWidget
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -25,16 +25,24 @@ class ProfileForm(forms.ModelForm):
 
 
 class PostForm(forms.ModelForm):
+    tags = forms.CharField(
+        max_length=50,
+        required=False,
+        help_text='Add new tag',
+        widget=TagWidget())
     class Meta:
         model = Post
         fields = ["title", "content"]
-
+        
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
 
     def save(self, commit=True):
         post = super().save(commit=False)
+        tag = self.cleaned_data["tags"]
+        if tag:
+            post.tags.add(*tag.split(","))
         if self.user:
             post.author = self.user
         if commit:
