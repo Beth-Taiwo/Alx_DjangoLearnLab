@@ -69,12 +69,13 @@ footer {
   padding: 30px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  width: 300px;
+  width: max-content;
+  min-width: 300px;
   text-align: center;
 }
 
 .form-container {
-  max-width: 900px;
+  width: 400px;
   margin: 40px auto;
   padding: 20px;
   background-color: #fff;

@@ -1,0 +1,17 @@
+{% extends "base.html" %} {% block content %} {% if posts %}
+<div>
+  <strong>{{tag_name}} posts</strong>
+  <ul>
+    {% for post in posts %}
+    <li>
+      <a href="{ url ''}">
+        <h3>{{ post.title }}</h3>
+      </a>
+      {% endfor %}
+    </li>
+  </ul>
+
+  {% else %}
+  <p>No Post under this tag</p>
+</div>
+{% endif %} {% endblock content %}

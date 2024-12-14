@@ -193,22 +193,13 @@ def tag_view(request, tag_name):
     return render(request, 'tags.html', context=context)
     
 
-class PostByTagListView():
+class PostByTagListView(ListView):
     model = Post
-    template_name = "blog/posts_by_tag.html"
-    def get_queryset(self):
-        tag = get_object_or_404(Tag, name__iexact=self.kwargs['tag_name'])
-        return Post.objects.filter(tags__name__icontains=tag.name)
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['tag_name'] = self.kwargs['tag_name']
-        return context
-    
+    template_name = 'tags.html'
 
 class SearchView(ListView):
     model = Post
-    template_name = "blog/search_results.html"
+    template_name = "blog/search.html"
     def get_queryset(self):
         query = self.request.GET.get('to_search', '')
         return Post.objects.filter(Q(title__icontains=query)|Q(content__icontains=query))
