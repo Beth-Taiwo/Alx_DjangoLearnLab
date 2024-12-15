@@ -1,13 +1,14 @@
 from rest_framework import serializers
-from .models import Post, Comment
+from .models import Post, Comment, Like
 
 
 class PostSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
     post_comments = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='comment_detail')
+    likes = serializers.SerializerMethodField()
     class Meta:
         model = Post
-        fields = ['title', 'content', 'author','post_comments']
+        fields = ['title', 'content', 'author','post_comments', 'likes']
 
     def create(self, validated_data):
         obj = Post.objects.create(**validated_data)
@@ -21,6 +22,9 @@ class PostSerializer(serializers.ModelSerializer):
         instance.updated_at = validated_data.get('updated_at', instance.updated_at)
         instance.save()
         return instance
+    
+    def get_likes(self, obj):
+        return obj.likes.count()
     
 class CommentSerializer(serializers.ModelSerializer):
     comment_author = serializers.ReadOnlyField(source='author.username')
@@ -42,3 +46,9 @@ class CommentSerializer(serializers.ModelSerializer):
     
     def get_post_title(self, obj):
         return obj.post.title
+    
+
+class LikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Like
+        fields = ['id', 'post', 'user']
