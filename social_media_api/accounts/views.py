@@ -5,6 +5,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from .serializers import CustomUserSerializer, TokenSerializer
 from rest_framework.permissions import IsAuthenticated
+from accounts.models import CustomUser
 
 # Create your views here.
 
@@ -31,6 +32,7 @@ class RetrieveTokenView(APIView):
     
 
 class FollowUserView(generics.GenericAPIView):
+    queryset = CustomUser.objects.all()
     permission_classes = [IsAuthenticated]
 
     def post(self, request, user_id):
@@ -42,6 +44,7 @@ class FollowUserView(generics.GenericAPIView):
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 class UnfollowUserView(generics.GenericAPIView):
+    queryset = CustomUser.objects.all()
     permission_classes = [IsAuthenticated]
 
     def post(self, request, user_id):
