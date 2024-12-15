@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, get_user_model
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from .serializers import CustomUserSerializer, TokenSerializer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import permissions
 from accounts.models import CustomUser
 
 # Create your views here.
@@ -33,7 +33,7 @@ class RetrieveTokenView(APIView):
 
 class FollowUserView(generics.GenericAPIView):
     queryset = CustomUser.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
         try:
@@ -45,7 +45,7 @@ class FollowUserView(generics.GenericAPIView):
 
 class UnfollowUserView(generics.GenericAPIView):
     queryset = CustomUser.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
         try:
