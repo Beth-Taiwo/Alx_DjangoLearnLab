@@ -4,12 +4,11 @@ from rest_framework import viewsets, generics, permissions, status
 from .serializers import PostSerializer, CommentSerializer, LikeSerializer
 from .models import Post, Comment, Like
 from django_filters import rest_framework as r_filters
-from rest_framework import filters
+from rest_framework import filters, generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from notifications.models import Notification
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
 
 # Create your views here.
 class StandardResultsSetPagination(PageNumberPagination):
@@ -32,13 +31,13 @@ class PostViewSet(viewsets.ModelViewSet):
         
     @action(detail=True, methods=['post'])
     def like(self, request, pk=None):
-        post = get_object_or_404(Post, pk=pk)
+        post = generics.get_object_or_404(Post, pk=pk)
         user = request.user
 
-        if Like.objects.filter(post=post, user=user).exists():
+        if Like.objects.filter(user=user,post=post).exists():
             return Response({'detail': 'You already liked this post.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        like = Like.objects.create(post=post, user=user)
+        like = Like.objects.get_or_create(user=request.user, post=post)
 
         # Create a notification
         Notification.objects.create(
@@ -52,10 +51,9 @@ class PostViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def unlike(self, request, pk=None):
-        post = get_object_or_404(Post, pk=pk)
-        user = request.user
+        post = generics.get_object_or_404(Post, pk=pk)
 
-        like = Like.objects.filter(post=post, user=user).first()
+        like = Like.objects.filter(user=request.user,post=post).first()
         if not like:
             return Response({'detail': 'You have not liked this post.'}, status=status.HTTP_400_BAD_REQUEST)
 
